@@ -1,0 +1,34 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Outputs
+outputs/checkpoints/*.pth
+outputs/logs/
+outputs/samples/
+outputs/graphs/
+
+# Data processed
+data/processed/*.pt
+data/processed/*.json
+
+# Tokenizer saved models
+tokenizer/saved/tokenizer.json
+tokenizer/saved/vocab.json
+tokenizer/saved/merges.txt
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+

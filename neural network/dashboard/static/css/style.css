@@ -1,0 +1,193 @@
+/* OMEGA NEURAL NETWORK ENGINE: Futuristic Cyberpunk Theme */
+:root {
+  --bg-primary: #07090e;
+  --bg-card: rgba(15, 23, 42, 0.7);
+  --neon-blue: #00f0ff;
+  --neon-violet: #8a2be2;
+  --neon-cyan: #38bdf8;
+  --border-glow: rgba(0, 240, 255, 0.25);
+  --border-violet: rgba(138, 43, 226, 0.3);
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(138, 43, 226, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(0, 240, 255, 0.1) 0%, transparent 45%);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-glow);
+  border-radius: 12px;
+}
+
+aside.sidebar {
+  width: 260px;
+  background: rgba(10, 14, 23, 0.9);
+  border-right: 1px solid var(--border-glow);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 14px;
+  gap: 16px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.omega-symbol {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--neon-blue);
+  text-shadow: 0 0 12px var(--neon-blue);
+}
+
+.logo-text h1 {
+  font-size: 15px;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.logo-text span {
+  font-size: 10px;
+  color: var(--neon-violet);
+  font-family: var(--font-mono);
+}
+
+nav.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  color: var(--neon-blue);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+.nav-item.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(0, 240, 255, 0.15), rgba(138, 43, 226, 0.15));
+  border: 1px solid var(--neon-blue);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+}
+
+main.main-viewport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+header.topbar {
+  height: 60px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-glow);
+  background: rgba(10, 14, 23, 0.6);
+}
+
+.view-container {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: none;
+}
+
+.view-container.active-view {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-card h3 {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.stat-card .val {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--neon-blue);
+  font-family: var(--font-mono);
+}
+
+button.neon-btn {
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-violet));
+  border: none;
+  color: #000;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button.neon-btn:hover {
+  box-shadow: 0 0 15px var(--neon-blue);
+}
+
+pre {
+  background: #05070a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #38bdf8;
+  overflow-x: auto;
+}

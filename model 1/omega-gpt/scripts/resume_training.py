@@ -1,0 +1,38 @@
+"""Script: Resume interrupted Omega GPT-1 training."""
+
+import argparse
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from config.model_config import get_model_config
+from config.training_config import get_training_config
+from tokenizer.tokenizer_utils import OmegaTokenizer
+from training.trainer import OmegaTrainer
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Resume Omega GPT-1 training from latest checkpoint")
+    parser.add_argument("--profile", type=str, default="small")
+    parser.add_argument("--max_steps", type=int, default=None)
+    parser.add_argument("--device", type=str, default="auto")
+    args = parser.parse_args()
+
+    model_cfg = get_model_config(profile=args.profile)
+    overrides = {"device": args.device}
+    if args.max_steps is not None:
+        overrides["max_steps"] = args.max_steps
+
+    train_cfg = get_training_config(**overrides)
+
+    tokenizer = OmegaTokenizer.load(train_cfg.tokenizer_dir)
+    model_cfg.vocab_size = tokenizer.get_vocab_size()
+
+    trainer = OmegaTrainer(model_config=model_cfg, training_config=train_cfg, tokenizer=tokenizer)
+    trainer.train(resume=True)
+
+
+if __name__ == "__main__":
+    main()
+

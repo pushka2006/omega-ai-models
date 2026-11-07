@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMEGA Neural Network Engine</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo-area">
+            <div class="omega-symbol">Ω</div>
+            <div class="logo-text">
+                <h1>OMEGA NEURAL</h1>
+                <span>DEEP LEARNING ENGINE</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" data-view="overview">📊 Overview</div>
+            <div class="nav-item" data-view="builder">🛠 Network Builder</div>
+            <div class="nav-item" data-view="training">🚀 Training Center</div>
+            <div class="nav-item" data-view="experiments">📈 Experiment Tracker</div>
+            <div class="nav-item" data-view="checkpoints">💾 Checkpoints</div>
+            <div class="nav-item" data-view="status">⚙ Device & Status</div>
+        </nav>
+    </aside>
+
+    <main class="main-viewport">
+        <header class="topbar">
+            <div>
+                <strong style="color:var(--neon-blue);">OMEGA Neural Engine</strong> | PyTorch Acceleration Active
+            </div>
+            <div style="font-size:12px; color:var(--text-muted);">
+                Device: <strong id="hw-active-device" style="color:var(--neon-violet);">CPU</strong> (<span id="hw-gpu-name">Detecting...</span>)
+            </div>
+        </header>
+
+        <!-- VIEW 1: OVERVIEW -->
+        <section id="view-overview" class="view-container active-view">
+            <div class="grid-3">
+                <div class="glass stat-card">
+                    <h3>Modular Layers</h3>
+                    <div class="val">18</div>
+                    <span style="font-size:12px; color:var(--text-muted);">Linear, Conv, RNN, Transformer, Norm</span>
+                </div>
+                <div class="glass stat-card">
+                    <h3>Supported Optimizers</h3>
+                    <div class="val">5</div>
+                    <span style="font-size:12px; color:var(--text-muted);">AdamW, Adam, SGD, RMSprop, Adagrad</span>
+                </div>
+                <div class="glass stat-card">
+                    <h3>Logged Experiments</h3>
+                    <div class="val" id="stat-experiments-count">0</div>
+                    <span style="font-size:12px; color:var(--text-muted);">Verifiable SQLite Metric Registry</span>
+                </div>
+            </div>
+
+            <div class="glass" style="padding:20px;">
+                <h3 style="font-size:16px; margin-bottom:10px;">Architecture Highlights</h3>
+                <p style="font-size:13px; line-height:1.6; color:var(--text-muted);">
+                    OMEGA Neural Network Engine provides a complete production and research deep learning stack.
+                    It supports pure autograd verification, custom PyTorch layers, declarative YAML/JSON network building,
+                    and bridges to OMEGA GPT-1 and OMEGA MODEL 2.
+                </p>
+            </div>
+        </section>
+
+        <!-- VIEW 2: BUILDER -->
+        <section id="view-builder" class="view-container">
+            <h2 style="font-size:18px;">Declarative Neural Network Builder</h2>
+            <p style="font-size:12px; color:var(--text-muted);">Define arbitrary layer topologies via JSON or YAML specification:</p>
+            <textarea id="builder-json" rows="10" style="width:100%; background:#05070a; color:#38bdf8; font-family:var(--font-mono); border:1px solid var(--border-glow); border-radius:8px; padding:12px;">{
+  "name": "omega_custom_mlp",
+  "input_size": 20,
+  "layers": [
+    {"type": "linear", "units": 64, "activation": "relu", "batch_norm": true},
+    {"type": "dropout", "rate": 0.2},
+    {"type": "linear", "units": 32, "activation": "gelu"},
+    {"type": "linear", "units": 4}
+  ]
+}</textarea>
+            <button class="neon-btn" id="validate-builder-btn" style="align-self:flex-start;">Validate & Inspect Model Dimensions</button>
+            <pre id="builder-result" style="min-height:80px;">(Awaiting validation...)</pre>
+        </section>
+
+        <!-- VIEW 3: TRAINING -->
+        <section id="view-training" class="view-container">
+            <h2 style="font-size:18px;">Training Center</h2>
+            <div class="glass" style="padding:16px; display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+                <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block;">Benchmark Task:</label>
+                    <select id="train-task" style="background:#0b1120; color:#fff; border:1px solid var(--border-glow); padding:6px; border-radius:6px;">
+                        <option value="spiral_classification">Non-Linear Spiral (3 Classes)</option>
+                        <option value="regression">10-D Linear Regression</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block;">Epochs:</label>
+                    <input type="number" id="train-epochs" value="30" style="width:70px; background:#0b1120; color:#fff; border:1px solid var(--border-glow); padding:6px; border-radius:6px;">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block;">Learning Rate:</label>
+                    <input type="number" id="train-lr" step="0.001" value="0.005" style="width:80px; background:#0b1120; color:#fff; border:1px solid var(--border-glow); padding:6px; border-radius:6px;">
+                </div>
+                <div>
+                    <label style="font-size:11px; color:var(--text-muted); display:block;">Optimizer:</label>
+                    <select id="train-opt" style="background:#0b1120; color:#fff; border:1px solid var(--border-glow); padding:6px; border-radius:6px;">
+                        <option value="adamw">AdamW</option>
+                        <option value="adam">Adam</option>
+                        <option value="sgd">SGD (Momentum=0.9)</option>
+                    </select>
+                </div>
+                <button class="neon-btn" id="start-train-btn" style="margin-top:16px;">Launch Real PyTorch Training</button>
+            </div>
+            <h3 style="font-size:14px; margin-top:10px;">Real-Time Execution Logs:</h3>
+            <pre id="train-log-box" style="min-height:160px;">(Ready to train...)</pre>
+        </section>
+
+        <!-- VIEW 4: EXPERIMENTS -->
+        <section id="view-experiments" class="view-container">
+            <h2 style="font-size:18px;">Experiment Tracker</h2>
+            <div id="experiments-list" class="grid-3"></div>
+        </section>
+
+        <!-- VIEW 5: CHECKPOINTS -->
+        <section id="view-checkpoints" class="view-container">
+            <h2 style="font-size:18px;">Saved Checkpoints</h2>
+            <div id="checkpoints-list" class="grid-3"></div>
+        </section>
+
+        <!-- VIEW 6: STATUS -->
+        <section id="view-status" class="view-container">
+            <h2 style="font-size:18px;">Hardware & Compute Telemetry</h2>
+            <pre id="status-json" style="color:var(--neon-cyan);">Loading telemetry...</pre>
+        </section>
+    </main>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

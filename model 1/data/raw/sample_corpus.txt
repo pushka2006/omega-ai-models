@@ -1,0 +1,24 @@
+# OMEGA GPT-1 SAMPLE TRAINING CORPUS
+# NOTICE: This is sample training data provided for immediate testing and verification.
+# For production use, replace or augment this directory with your own domain-specific raw .txt files.
+
+Artificial intelligence represents the synthesis of computational algorithms, statistical learning, and information theory to construct systems capable of performing cognitive tasks. Language modeling is the foundational paradigm of modern generative intelligence, framing knowledge acquisition as next-token prediction over sequential discrete distributions.
+
+The Transformer architecture, founded upon the self-attention mechanism, processes variable-length sequences without recurrence or convolution. In a decoder-only Transformer such as Omega GPT-1, causal masking enforces autoregressive factorization, guaranteeing that prediction of token t depends exclusively on predecessors from index 1 through t-1.
+
+Self-attention computes dynamic weightings across representations. Given an input matrix X, linear transformations produce Queries Q, Keys K, and Values V. Scaled dot-product attention computes Attention(Q, K, V) = softmax(Q K^T / sqrt(d_k) + M) V, where M is the causal triangular mask with negative infinity above the diagonal. This formulation allows each position to attend strictly to preceding context while maintaining parallelism during backpropagation.
+
+Multi-head attention projects Queries, Keys, and Values into multiple lower-dimensional subspaces, permitting the network to jointly attend to information from distinct representation subspaces at distinct positions. The individual head outputs are concatenated and linearly projected back to the primary embedding dimension.
+
+Each transformer layer incorporates a Feed-Forward Network (FFN) consisting of two linear transformations separated by a non-linear activation function. In Omega GPT-1, the Gaussian Error Linear Unit (GELU) provides smooth probabilistic gating: GELU(x) = x * Phi(x), where Phi is the standard cumulative Gaussian distribution. The FFN expands the internal representation to four times the model dimension before projecting back, acting as a key-value associative memory over learned linguistic patterns.
+
+Residual connections bypass each sub-layer: x = x + SubLayer(x). Combined with Pre-Layer Normalization, where normalization occurs directly prior to attention and feed-forward operations, gradients flow unimpeded through the residual backbone during optimization, ensuring numerical stability even across deep transformer stacks.
+
+Weight tying binds the parameters of the input token embedding matrix directly with the transpose of the final language modeling projection head. This structural constraint enforces geometric alignment between token input representations and output logit spaces while reducing total model parameter overhead.
+
+Training proceeds by minimizing cross-entropy loss over a discrete vocabulary V: L(theta) = - sum log P(x_t | x_{<t}; theta). The AdamW optimizer decouples weight decay from gradient updates, stabilizing weight shrinkage under adaptive momentum estimates. Cosine learning rate scheduling with a preliminary linear warmup phase guides optimization away from unstable initial configurations toward optimal local minima.
+
+Tokenization serves as the bridge between continuous neural representations and discrete human language. Byte Pair Encoding (BPE) iteratively merges the most frequent pairs of bytes or characters, constructing a subword vocabulary that mitigates out-of-vocabulary anomalies while preserving compression efficiency.
+
+The Omega GPT-1 project establishes a fully sovereign, randomly initialized language model. By training the tokenizer, embedding layers, causal attention blocks, and optimization infrastructure entirely from scratch, the system demonstrates the core mechanics of modern large language models.
+

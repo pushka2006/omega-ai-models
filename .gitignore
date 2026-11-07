@@ -1,0 +1,33 @@
+# Virtual Environments
+.venv/
+omega-neural-network/
+venv/
+env/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Large Redundant Checkpoints & Archives (preserve omega_gpt1_best.pth & neural_network_model.pth)
+model 1/checkpoints/omega_gpt1_colab.pth
+model 1/checkpoints/omega_gpt1_latest.pth
+model 1/omega-gpt.zip
+model 1/backup_pre_upgrade/
+checkpoints_saved/
+
+# Ephemeral SQLite & Runtime Logs
+*.db-journal
+*.db-wal
+*.db-shm
+*.log
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

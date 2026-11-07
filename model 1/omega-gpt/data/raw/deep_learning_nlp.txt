@@ -1,0 +1,81 @@
+# DEEP LEARNING, TRANSFORMER ARCHITECTURES, AND NATURAL LANGUAGE PROCESSING
+
+## 1. Mathematical Foundations of Transformers
+The Transformer is an attention-based sequence transducer that eliminates recurrent and convolutional inductive biases in favor of parallelized dot-product attention over continuous vector embeddings.
+
+In a decoder-only language model, an input token sequence x = (x_1, x_2, ..., x_T) is mapped into continuous vector space via an embedding matrix W_e in R^(V x d_model), supplemented by learned positional embeddings W_p in R^(T_max x d_model). The resulting sequence representation H_0 = W_e[x] + W_p[:T] serves as the input to a stack of L Transformer blocks.
+
+## 2. Multi-Head Causal Self-Attention
+Self-attention transforms representations by enabling each token to aggregate contextual information from all preceding tokens. Given an input matrix H in R^(T x d_model), linear projections yield Queries Q, Keys K, and Values V:
+    Q = H W_q,   K = H W_k,   V = H W_v
+where W_q, W_k, W_v in R^(d_model x d_model).
+
+Scaled dot-product attention computes compatibility between queries and keys scaled by the square root of the head dimension d_k:
+    Attention(Q, K, V) = softmax((Q K^T / sqrt(d_k)) + M) V
+where M is the causal triangular mask defined as:
+    M_ij = 0 if i >= j else -infinity.
+The causal mask guarantees that prediction at position i depends strictly on antecedent tokens at positions j <= i, preserving autoregressive factorization:
+    P(x_1, x_2, ..., x_T) = prod_{t=1}^T P(x_t | x_1, ..., x_{t-1}).
+
+Multi-head attention divides the embedding dimension into h parallel attention heads, enabling the model to jointly attend to information across different representation subspaces:
+    MultiHead(H) = Concat(head_1, head_2, ..., head_h) W_o
+where each head_i = Attention(H W_q^i, H W_k^i, H W_v^i) and W_o in R^(d_model x d_model).
+
+## 3. Pre-Layer Normalization and Residual Connections
+Modern Transformer architectures employ Pre-Layer Normalization (Pre-LN) for training stability. Layer normalization standardizes activations across the channel dimension to have zero mean and unit variance:
+    LN(x) = ((x - mu) / sqrt(sigma^2 + epsilon)) * gamma + beta.
+In Pre-LN blocks, normalization is applied immediately prior to the attention and feed-forward sublayers:
+    H'_l = H_{l-1} + MultiHeadAttention(LN(H_{l-1}))
+    H_l  = H'_l + FeedForward(LN(H'_l)).
+Residual connections provide an unobstructed gradient highway directly through the network depth, eliminating gradient vanishing during backpropagation.
+
+## 4. Feed-Forward Networks and Non-Linear Gating
+Each Transformer block contains a position-wise Feed-Forward Network (FFN) that acts as key-value associative memory. In standard implementations, the FFN expands representations to an intermediate dimension d_ff (typically 4 * d_model) before projecting back:
+    FFN(x) = GELU(x W_1 + b_1) W_2 + b_2.
+The Gaussian Error Linear Unit (GELU) activation smoothly gates values via the cumulative normal distribution Phi(x):
+    GELU(x) = x * Phi(x) approx 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3))).
+
+## 5. Byte Pair Encoding (BPE) Tokenization
+Tokenization decomposes raw Unicode text into discrete integers. Byte Pair Encoding starts from individual byte characters and iteratively merges the most frequently occurring adjacent pairs to construct subword tokens.
+Key advantages of BPE tokenization include:
+1. Complete vocabulary coverage without out-of-vocabulary (OOV) tokens.
+2. Compression of common words into single tokens while preserving subword components for rare terms.
+3. Language and Unicode invariance through byte-level pre-tokenization.
+
+Special tokens delimit sequences:
+- [PAD] (ID: 0): Padding for equalized batch dimensions.
+- [UNK] (ID: 1): Unrecognized or replacement token.
+- [BOS] (ID: 2): Beginning-of-sequence delimiter.
+- [EOS] (ID: 3): End-of-sequence delimiter signaling completion.
+
+## 6. Autoregressive Training and Cross-Entropy Optimization
+Language model pre-training minimizes the negative log-likelihood (cross-entropy) over sequential corpus tokens:
+    L(theta) = - 1/T sum_{t=1}^T log P(x_t | x_{<t}; theta).
+The AdamW optimizer computes running first and second momentum estimates of gradients:
+    m_t = beta_1 * m_{t-1} + (1 - beta_1) * g_t
+    v_t = beta_2 * v_{t-1} + (1 - beta_2) * g_t^2
+    theta_t = theta_{t-1} - lr * (m_t / (sqrt(v_t) + eps)) - lr * lambda * theta_{t-1}.
+Decoupled weight decay (lambda) applies directly to weight matrices, preventing weight explosion without corrupting adaptive gradient scales.
+
+Cosine learning rate scheduling with a linear warmup phase increases the learning rate from zero to its maximum value over the initial iterations, followed by a smooth cosine decay toward a minimum threshold:
+    lr(step) = min_lr + 0.5 * (peak_lr - min_lr) * (1 + cos(pi * step / total_steps)).
+
+## 7. Inference and Sampling Strategies
+During inference, the model generates text autoregressively by iteratively predicting the probability distribution over the vocabulary for the next token:
+1. Temperature Scaling: Controls the entropy of the probability distribution:
+    P_i = exp(z_i / T) / sum_j exp(z_j / T).
+    Lower temperatures (T < 0.7) yield deterministic and focused outputs; higher temperatures (T > 0.8) increase output diversity.
+2. Top-K Sampling: Truncates the vocabulary distribution to the top K highest-probability tokens.
+3. Top-P (Nucleus) Sampling: Restricts sampling dynamically to the smallest subset of tokens whose cumulative probability exceeds threshold p (typically p = 0.9).
+4. Repetition Penalty: Penalizes logits of previously generated tokens to prevent repetitive loops.
+
+## 8. Questions and Answers
+Q: What is the primary purpose of causal masking in GPT models?
+A: Causal masking prevents attention queries from attending to future tokens, ensuring that predictions strictly depend on preceding context and maintaining autoregressive generation validity.
+
+Q: Why is weight tying beneficial in language models?
+A: Weight tying shares weights between the token embedding matrix and the final linear projection head. This aligns input and output vector spaces and reduces total parameter count without sacrificing performance.
+
+Q: How does Pre-LayerNorm differ from Post-LayerNorm?
+A: Pre-LayerNorm applies normalization directly before attention and feed-forward operations within the residual branch, allowing unimpeded gradient flow through the residual backbone and preventing training instability.
+

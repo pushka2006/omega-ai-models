@@ -50,12 +50,17 @@ class AssistantAdapter:
             }
 
         try:
-            res = self.generator.generate_response(user_id=user_id, user_message=query)
+            res = self.generator.process_query(query=query, conversation_id=user_id)
             return {
                 "source": "omega_model_2",
                 "response": res.get("response", ""),
+                "thought_chain": res.get("thought_chain", ""),
                 "intent": res.get("intent", "general"),
-                "metadata": res.get("metadata", {})
+                "metadata": {
+                    "provider": res.get("provider"),
+                    "latency_ms": res.get("latency_ms"),
+                    "thought_chain": res.get("thought_chain", ""),
+                }
             }
         except Exception as e:
             return {

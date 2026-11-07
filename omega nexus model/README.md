@@ -67,3 +67,4 @@ python main.py fuse "Classify anomaly" --features 0.5,1.2,-0.4,0.8
 # 5. Launch FastAPI REST Server
 python main.py server --port 8600
 ```
+

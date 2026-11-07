@@ -109,3 +109,4 @@ class NexusFusionNetwork(nn.Module):
         logits = self.classifier_head(pooled)
 
         return fused, logits
+

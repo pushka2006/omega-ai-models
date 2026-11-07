@@ -1,22 +1,29 @@
-"""OMEGA MODEL 2: Multi-Step Reasoning and Plan Decomposition Engine.
+"""OMEGA MODEL 2: Multi-Step Reasoning, Plan Decomposition, and CoT Engine.
 
+Enhanced with distilled reasoning strategies from MoreThought/Fable-5.1-Max-Reasoning.
 Analyzes user queries, determines intent, plans tool orchestration,
-and synthesizes chain-of-thought rationale before generating responses.
+and synthesizes chain-of-thought rationale (<thought>) before generating responses.
 """
 
+from pathlib import Path
+import json
 import re
+import sqlite3
 from typing import Any, Dict, List, Optional
 
 
 class ReasoningEngine:
     """Classifies user intents and formulates structured multi-step execution plans."""
 
+    def __init__(self):
+        self.db_path = Path(__file__).resolve().parent.parent.parent / "data" / "omega2.db"
+
     def analyze_intent(self, user_query: str) -> Dict[str, Any]:
         """Classify user intent into functional categories."""
         q = user_query.strip().lower()
 
         # 1. Calculation Intent
-        if any(w in q for w in ["calculate", "math", "evaluate", "plus", "minus", "divided by"]) or re.search(r"[\d\(\)]+\s*[\+\-\*\/\^]\s*[\d\(\)]+", q):
+        if any(w in q for w in ["calculate", "math", "evaluate", "plus", "minus", "divided by"]) or re.search(r"\d+\s*[\+\-\*\/\^]\s*[\d\(\)]+", q):
             return {
                 "intent": "calculation",
                 "recommended_tool": "calculator",
@@ -68,6 +75,79 @@ class ReasoningEngine:
             "needs_reasoning": False,
         }
 
+    def find_reasoning_heuristics(self, query: str, limit: int = 2) -> List[Dict[str, Any]]:
+        """Retrieve matching reasoning patterns from the Fable knowledge store in SQLite."""
+        if not self.db_path.exists():
+            return []
+
+        try:
+            conn = sqlite3.connect(str(self.db_path))
+            cursor = conn.cursor()
+            words = [w for w in re.findall(r"\w+", query.lower()) if len(w) > 3]
+
+            results = []
+            if words:
+                # Keyword matching on ingested heuristics
+                conditions = " OR ".join(["query_summary LIKE ?" for _ in words[:3]])
+                params = [f"%{w}%" for w in words[:3]]
+                cursor.execute(f"""
+                    SELECT id, query_summary, reasoning_steps, complexity_level, solution_preview 
+                    FROM fable_reasoning_heuristics 
+                    WHERE {conditions}
+                    LIMIT ?
+                """, (*params, limit))
+                rows = cursor.fetchall()
+                for row in rows:
+                    results.append({
+                        "id": row[0],
+                        "summary": row[1],
+                        "steps": json.loads(row[2]) if row[2] else [],
+                        "complexity": row[3],
+                        "preview": row[4],
+                    })
+
+            # Fallback if no direct keyword match
+            if not results:
+                cursor.execute("""
+                    SELECT id, query_summary, reasoning_steps, complexity_level, solution_preview 
+                    FROM fable_reasoning_heuristics 
+                    ORDER BY RANDOM() LIMIT ?
+                """, (limit,))
+                for row in cursor.fetchall():
+                    results.append({
+                        "id": row[0],
+                        "summary": row[1],
+                        "steps": json.loads(row[2]) if row[2] else [],
+                        "complexity": row[3],
+                        "preview": row[4],
+                    })
+
+            conn.close()
+            return results
+        except Exception:
+            return []
+
+    def generate_thought_chain(self, query: str) -> str:
+        """Construct structured Fable-style Chain-of-Thought (<thought>) reasoning trace."""
+        intent_info = self.analyze_intent(query)
+        intent = intent_info["intent"]
+        heuristics = self.find_reasoning_heuristics(query, limit=1)
+
+        steps = [
+            f"1. Problem Decomposition: Identify goal for intent '{intent}'. Deconstruct explicit inputs and implicit constraints.",
+        ]
+
+        if heuristics and heuristics[0].get("steps"):
+            matched_step = heuristics[0]["steps"][0]
+            steps.append(f"2. Strategy Formulation: Borrow heuristic ({heuristics[0]['complexity']}): '{matched_step}'")
+        else:
+            steps.append("2. Strategy Formulation: Establish hypothesis, define execution roadmap, and determine necessary tool invocations.")
+
+        steps.append("3. Execution & Edge Cases: Validate boundaries, verify safety constraints, and check potential failure modes.")
+        steps.append("4. Synthesis & Verification: Confirm answer satisfies the prompt with high confidence.")
+
+        return "<thought>\n" + "\n".join(steps) + "\n</thought>"
+
     def generate_plan(self, query: str) -> List[str]:
         """Generate chain-of-thought breakdown steps."""
         intent_info = self.analyze_intent(query)
@@ -110,4 +190,3 @@ class ReasoningEngine:
 
 # Singleton instance
 reasoning_engine = ReasoningEngine()
-

@@ -4,6 +4,7 @@ Harmonizes OMEGA GPT-1, OMEGA Model 2, and OMEGA Neural Engine into a unified,
 multimodal intelligence architecture.
 """
 
+from pathlib import Path
 from typing import Dict, Any, Optional
 import torch
 import torch.nn.functional as F
@@ -32,8 +33,18 @@ class OmegaNexus:
             text_dim=256,
             feature_dim=16,
             latent_dim=LATENT_DIM,
-            num_classes=5,
+            num_classes=4,
         ).to(self.device)
+
+        ckpt_path = Path(__file__).resolve().parent.parent / "checkpoints" / "nexus_reasoning_fusion.pth"
+        if ckpt_path.exists():
+            try:
+                ckpt = torch.load(str(ckpt_path), map_location=self.device, weights_only=False)
+                self.fusion.load_state_dict(ckpt["model_state_dict"])
+                print(f"[OMEGA NEXUS] Loaded fine-tuned reasoning fusion weights from '{ckpt_path.name}'.")
+            except Exception as e:
+                print(f"[OMEGA NEXUS] Note: Initialized base fusion network ({e}).")
+
         self.fusion.eval()
 
     def get_system_status(self) -> Dict[str, Any]:

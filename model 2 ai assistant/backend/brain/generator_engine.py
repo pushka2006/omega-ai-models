@@ -44,6 +44,7 @@ class GeneratorEngine:
 
         # 2. Analyze Intent & Planning
         intent_info = reasoning_engine.analyze_intent(clean_query)
+        thought_chain = reasoning_engine.generate_thought_chain(clean_query)
         tool_executed = None
         tool_result = None
 
@@ -169,6 +170,7 @@ class GeneratorEngine:
         return {
             "conversation_id": conversation_id,
             "response": response_text,
+            "thought_chain": thought_chain,
             "provider": gen_output.get("provider", provider),
             "model": gen_output.get("model", "omega-brain"),
             "tool_executed": tool_executed,
